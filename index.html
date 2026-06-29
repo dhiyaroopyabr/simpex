@@ -80,7 +80,13 @@ tailwind.config = {
   <section id="tab-dashboard">
     <section class="bg-surface-container-lowest rounded-xl p-stack-md soft-shadow mb-stack-lg">
       <div class="flex justify-between items-center mb-stack-md">
-        <span id="dash-month-label" class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">—</span>
+        <div class="relative inline-block text-left">
+          <button id="dash-month-btn" onclick="toggleMonthDropdown(event)" class="flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider hover:text-primary active-scale transition-colors">
+            <span id="dash-month-label">—</span>
+            <span class="material-symbols-outlined text-[16px] pointer-events-none">expand_more</span>
+          </button>
+          <div id="dash-month-dropdown" class="hidden absolute left-0 mt-2 w-48 rounded-lg bg-surface-container-lowest soft-shadow border border-outline-variant/10 py-1 z-50"></div>
+        </div>
       </div>
       <div class="flex flex-col gap-4">
         <div>
@@ -376,10 +382,52 @@ function toggleDay(day){
   renderDashboard();
 }
 
+/* ---------- MONTH SELECTION ---------- */
+function toggleMonthDropdown(event) {
+  event.stopPropagation();
+  const dropdown = document.getElementById('dash-month-dropdown');
+  dropdown.classList.toggle('hidden');
+}
+
+function closeMonthDropdown() {
+  const dropdown = document.getElementById('dash-month-dropdown');
+  if (dropdown) dropdown.classList.add('hidden');
+}
+
+function selectMonth(key) {
+  activeMonthKey = key;
+  ensureMonth(key);
+  closeMonthDropdown();
+  renderAll();
+}
+
+window.addEventListener('click', closeMonthDropdown);
+
 /* ---------- RENDER: DASHBOARD ---------- */
 function renderDashboard(){
   const month = data.months[activeMonthKey];
   const t = getMonthTotals(month);
+
+  // Render dropdown items
+  const dropdownEl = document.getElementById('dash-month-dropdown');
+  if (dropdownEl) {
+    const monthKeys = new Set();
+    for (let offset = 0; offset <= 5; offset++) {
+      monthKeys.add(monthKeyOffset(offset));
+    }
+    Object.keys(data.months).forEach(k => monthKeys.add(k));
+    const sortedKeys = Array.from(monthKeys).sort((a, b) => b.localeCompare(a));
+    dropdownEl.innerHTML = sortedKeys.map(k => {
+      const isActive = k === activeMonthKey;
+      return `
+        <button onclick="selectMonth('${k}')" class="w-full text-left px-4 py-2 text-body-md transition-colors hover:bg-surface-container flex justify-between items-center ${isActive ? 'text-primary font-semibold bg-primary-fixed/20' : 'text-on-surface'}">
+          <span>${monthKeyToLabel(k)}</span>
+          ${isActive ? '<span class="material-symbols-outlined text-[16px] text-primary">check</span>' : ''}
+        </button>
+      `;
+    }).join('');
+  }
+
   document.getElementById('dash-month-label').textContent = monthKeyToLabel(activeMonthKey);
   document.getElementById('dash-spent').textContent = fmt(t.spent);
   document.getElementById('dash-budget').textContent = fmt(month.budgetLimit);
