@@ -1,0 +1,524 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
+<title>Simpex</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#142175">
+<link rel="icon" href="icons/favicon-32.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Simpex">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "on-primary-fixed": "#000d60","surface-container": "#edeeef","secondary-fixed": "#6ffbbe",
+        "inverse-on-surface": "#f0f1f2","on-tertiary-container": "#f29c06","outline": "#767682",
+        "on-tertiary-fixed-variant": "#653e00","background": "#f8f9fa","primary": "#142175",
+        "on-secondary-fixed": "#002113","on-background": "#191c1d","outline-variant": "#c6c5d3",
+        "primary-fixed-dim": "#bcc3ff","surface-bright": "#f8f9fa","tertiary-fixed": "#ffddb8",
+        "primary-container": "#2e3a8c","secondary-fixed-dim": "#4edea3","surface-container-highest": "#e1e3e4",
+        "secondary": "#006c49","error-container": "#ffdad6","tertiary": "#412600",
+        "surface-container-lowest": "#ffffff","on-secondary": "#ffffff","secondary-container": "#6cf8bb",
+        "error": "#ba1a1a","inverse-primary": "#bcc3ff","tertiary-fixed-dim": "#ffb95f",
+        "on-surface": "#191c1d","on-primary-fixed-variant": "#333f91","on-error": "#ffffff",
+        "inverse-surface": "#2e3132","on-primary": "#ffffff","on-surface-variant": "#454651",
+        "surface": "#f8f9fa","on-tertiary-fixed": "#2a1700","on-tertiary": "#ffffff",
+        "primary-fixed": "#dfe0ff","surface-variant": "#e1e3e4","on-error-container": "#93000a",
+        "on-primary-container": "#9ea9ff","surface-container-high": "#e7e8e9","surface-dim": "#d9dadb",
+        "on-secondary-container": "#00714d","surface-container-low": "#f3f4f5","surface-tint": "#4b57aa",
+        "tertiary-container": "#5f3a00","on-secondary-fixed-variant": "#005236"
+      },
+      borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+      spacing: { "stack-lg":"24px","margin-page":"20px","stack-sm":"8px","stack-md":"16px","gutter-card":"12px" },
+      fontFamily: { "body-lg":["Inter"],"label-sm":["Inter"],"currency-display":["Inter"],"headline-lg":["Inter"],"headline-md":["Inter"],"body-md":["Inter"] },
+      fontSize: {
+        "body-lg": ["16px", {lineHeight:"24px", fontWeight:"400"}],
+        "label-sm": ["12px", {lineHeight:"16px", letterSpacing:"0.05em", fontWeight:"600"}],
+        "currency-display": ["32px", {lineHeight:"40px", letterSpacing:"-0.03em", fontWeight:"700"}],
+        "headline-lg": ["24px", {lineHeight:"32px", letterSpacing:"-0.02em", fontWeight:"700"}],
+        "headline-md": ["20px", {lineHeight:"28px", letterSpacing:"-0.01em", fontWeight:"600"}],
+        "body-md": ["14px", {lineHeight:"20px", fontWeight:"400"}]
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { background-color:#f8f9fa; font-family:'Inter',sans-serif; min-height:max(884px,100dvh); }
+  .soft-shadow { box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
+  .active-scale:active { transform: scale(0.98); transition: transform 0.1s; }
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+  .hidden-tab { display:none; }
+  .modal-backdrop { background: rgba(0,0,0,0.4); }
+</style>
+</head>
+<body class="font-body-lg text-on-surface antialiased pb-24">
+
+<header class="bg-surface top-0 z-40 sticky">
+  <div class="flex justify-between items-center w-full px-margin-page h-16">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+      <h1 class="font-headline-md text-headline-md font-bold text-primary">Simpex</h1>
+    </div>
+  </div>
+</header>
+
+<main class="px-margin-page mt-stack-md flex flex-col gap-stack-lg">
+
+  <!-- ===== DASHBOARD TAB ===== -->
+  <section id="tab-dashboard">
+    <section class="bg-surface-container-lowest rounded-xl p-stack-md soft-shadow mb-stack-lg">
+      <div class="flex justify-between items-center mb-stack-md">
+        <span id="dash-month-label" class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">—</span>
+      </div>
+      <div class="flex flex-col gap-4">
+        <div>
+          <p class="font-label-sm text-label-sm text-on-surface-variant">Total Spent</p>
+          <p id="dash-spent" class="font-currency-display text-currency-display text-primary">₹0</p>
+        </div>
+        <div class="grid grid-cols-2 gap-stack-md border-t border-outline/10 pt-4">
+          <div>
+            <p class="font-label-sm text-label-sm text-on-surface-variant">Target Max</p>
+            <p id="dash-budget" class="font-headline-md text-headline-md">₹0</p>
+          </div>
+          <div>
+            <p class="font-label-sm text-label-sm text-on-surface-variant">Remaining</p>
+            <p id="dash-remaining" class="font-headline-md text-headline-md text-secondary">₹0</p>
+          </div>
+        </div>
+        <div class="mt-2">
+          <div class="w-full h-3 bg-surface-container rounded-full overflow-hidden">
+            <div id="dash-progress-bar" class="h-full bg-primary transition-all duration-700 ease-out" style="width:0%"></div>
+          </div>
+          <div class="flex justify-between mt-1">
+            <span id="dash-progress-pct" class="font-label-sm text-label-sm text-outline">0% used</span>
+            <span id="dash-budget-mini" class="font-label-sm text-label-sm text-outline">₹0 limit</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-stack-sm">
+      <h2 class="font-label-sm text-label-sm text-on-surface-variant px-1 uppercase tracking-widest mb-1">Daily Records</h2>
+      <div id="dash-day-list" class="flex flex-col gap-stack-sm"></div>
+    </section>
+  </section>
+
+  <!-- ===== PLANNER TAB ===== -->
+  <section id="tab-planner" class="hidden-tab">
+    <section class="mb-stack-lg">
+      <h2 class="font-headline-lg text-headline-lg text-on-surface">Monthly Planner</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">Your spending timeline</p>
+    </section>
+
+    <section class="space-y-stack-md mb-stack-lg">
+      <div class="flex items-center justify-between">
+        <h3 class="font-headline-md text-headline-md">Timeline</h3>
+        <span class="material-symbols-outlined text-on-surface-variant">calendar_month</span>
+      </div>
+
+      <div class="bg-surface-container-lowest p-stack-lg rounded-xl soft-shadow border-l-4 border-primary">
+        <div class="flex justify-between items-start mb-stack-md">
+          <div>
+            <span class="font-label-sm text-label-sm text-primary uppercase bg-primary-fixed px-2 py-0.5 rounded-full">Current Month</span>
+            <h4 id="plan-month-label" class="font-headline-lg text-headline-lg mt-2">—</h4>
+          </div>
+        </div>
+        <button onclick="openBudgetModal()" class="w-full flex items-center justify-between py-4 border-y border-outline-variant/10 px-2 active-scale">
+          <p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Budget Limit</p>
+          <div class="flex items-center gap-2">
+            <p id="plan-budget" class="font-headline-md text-headline-md text-on-surface">₹0</p>
+            <span class="material-symbols-outlined text-[16px] text-on-surface-variant/50">edit</span>
+          </div>
+        </button>
+        <div class="py-stack-md space-y-stack-sm">
+          <p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Income Sources</p>
+          <div id="plan-income-list" class="space-y-stack-sm"></div>
+          <button onclick="openIncomeModal()" class="w-full py-2 border border-dashed border-outline-variant rounded-lg flex items-center justify-center gap-2 text-on-surface-variant hover:text-primary transition-colors active-scale">
+            <span class="material-symbols-outlined text-[18px]">add_circle</span>
+            <span class="font-label-sm text-label-sm">ADD INCOME SOURCE</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="plan-past-months" class="space-y-stack-sm"></div>
+    </section>
+  </section>
+
+  <!-- ===== SUMMARY TAB ===== -->
+  <section id="tab-summary" class="hidden-tab">
+    <section class="mb-stack-lg">
+      <h2 class="font-headline-lg text-headline-lg text-primary">Monthly Summary</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">Your spending timeline</p>
+    </section>
+    <div id="summary-list" class="space-y-gutter-card mb-stack-lg"></div>
+  </section>
+
+</main>
+
+<!-- FAB -->
+<button id="fab-add" onclick="openExpenseModal()" class="fixed right-6 bottom-24 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center active-scale z-40">
+  <span class="material-symbols-outlined" style="font-variation-settings:'wght' 600;">add</span>
+</button>
+
+<!-- Bottom Nav -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface-container-lowest rounded-t-xl shadow-lg">
+  <button data-tab="dashboard" onclick="switchTab('dashboard')" class="nav-btn flex flex-col items-center justify-center rounded-full px-6 py-1 active-scale">
+    <span class="material-symbols-outlined">grid_view</span>
+    <span class="font-label-sm text-label-sm">Dashboard</span>
+  </button>
+  <button data-tab="summary" onclick="switchTab('summary')" class="nav-btn flex flex-col items-center justify-center rounded-full px-6 py-1 active-scale">
+    <span class="material-symbols-outlined">bar_chart</span>
+    <span class="font-label-sm text-label-sm">Summary</span>
+  </button>
+  <button data-tab="planner" onclick="switchTab('planner')" class="nav-btn flex flex-col items-center justify-center rounded-full px-6 py-1 active-scale">
+    <span class="material-symbols-outlined">event_note</span>
+    <span class="font-label-sm text-label-sm">Planner</span>
+  </button>
+</nav>
+
+<!-- ===== MODALS ===== -->
+<div id="modal-expense" class="hidden fixed inset-0 z-[60] flex items-center justify-center modal-backdrop px-margin-page">
+  <div class="bg-surface-container-lowest rounded-xl p-stack-lg w-full max-w-sm soft-shadow">
+    <h3 class="font-headline-md text-headline-md mb-stack-md">Add Expense</h3>
+    <label class="font-label-sm text-label-sm text-on-surface-variant">Month</label>
+    <select id="exp-month" class="w-full border border-outline-variant rounded-lg p-2 mb-3 mt-1"></select>
+    <label class="font-label-sm text-label-sm text-on-surface-variant">Day of month</label>
+    <input id="exp-day" type="number" min="1" max="31" class="w-full border border-outline-variant rounded-lg p-2 mb-3 mt-1">
+    <label class="font-label-sm text-label-sm text-on-surface-variant">Description</label>
+    <input id="exp-desc" type="text" placeholder="e.g. Lunch" class="w-full border border-outline-variant rounded-lg p-2 mb-3 mt-1">
+    <label class="font-label-sm text-label-sm text-on-surface-variant">Amount (₹)</label>
+    <input id="exp-amount" type="number" min="0" class="w-full border border-outline-variant rounded-lg p-2 mb-stack-md mt-1">
+    <div class="flex gap-3">
+      <button onclick="closeModal('modal-expense')" class="flex-1 py-2 rounded-lg border border-outline-variant active-scale">Cancel</button>
+      <button onclick="saveExpense()" class="flex-1 py-2 rounded-lg bg-primary text-on-primary active-scale">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-budget" class="hidden fixed inset-0 z-[60] flex items-center justify-center modal-backdrop px-margin-page">
+  <div class="bg-surface-container-lowest rounded-xl p-stack-lg w-full max-w-sm soft-shadow">
+    <h3 class="font-headline-md text-headline-md mb-stack-md">Edit Budget Limit</h3>
+    <label class="font-label-sm text-label-sm text-on-surface-variant">Budget (₹)</label>
+    <input id="budget-amount" type="number" min="0" class="w-full border border-outline-variant rounded-lg p-2 mb-stack-md mt-1">
+    <div class="flex gap-3">
+      <button onclick="closeModal('modal-budget')" class="flex-1 py-2 rounded-lg border border-outline-variant active-scale">Cancel</button>
+      <button onclick="saveBudget()" class="flex-1 py-2 rounded-lg bg-primary text-on-primary active-scale">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-income" class="hidden fixed inset-0 z-[60] flex items-center justify-center modal-backdrop px-margin-page">
+  <div class="bg-surface-container-lowest rounded-xl p-stack-lg w-full max-w-sm soft-shadow">
+    <h3 class="font-headline-md text-headline-md mb-stack-md">Add Income Source</h3>
+    <label class="font-label-sm text-label-sm text-on-surface-variant">Name</label>
+    <input id="income-name" type="text" placeholder="e.g. Freelance UI" class="w-full border border-outline-variant rounded-lg p-2 mb-3 mt-1">
+    <label class="font-label-sm text-label-sm text-on-surface-variant">Amount (₹)</label>
+    <input id="income-amount" type="number" min="0" class="w-full border border-outline-variant rounded-lg p-2 mb-stack-md mt-1">
+    <div class="flex gap-3">
+      <button onclick="closeModal('modal-income')" class="flex-1 py-2 rounded-lg border border-outline-variant active-scale">Cancel</button>
+      <button onclick="saveIncome()" class="flex-1 py-2 rounded-lg bg-primary text-on-primary active-scale">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'simpex_data_v1';
+let data = loadData();
+let expandedDays = new Set();
+let activeMonthKey = ensureCurrentMonth();
+let currentTab = 'dashboard';
+
+function loadData(){
+  try { const raw = JSON.parse(localStorage.getItem(STORAGE_KEY)); return raw && raw.months ? raw : { months:{} }; }
+  catch(e){ return { months:{} }; }
+}
+function saveData(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+function pad(n){ return n < 10 ? '0'+n : ''+n; }
+function currentMonthKey(){ const d = new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1); }
+function currentDay(){ return new Date().getDate(); }
+function monthKeyToLabel(key){
+  const [y,m] = key.split('-').map(Number);
+  return new Date(y, m-1, 1).toLocaleString('en-US', { month:'long', year:'numeric' });
+}
+function fmt(n){
+  n = Number(n) || 0;
+  const sign = n < 0 ? '-' : '';
+  return sign + '₹' + Math.abs(n).toLocaleString('en-IN');
+}
+function genId(){ return 'id'+Date.now()+Math.random().toString(36).slice(2,8); }
+
+function ensureMonth(key){
+  if(!data.months[key]){
+    data.months[key] = { budgetLimit: 0, income: [], expenses: [] };
+    saveData();
+  }
+  return data.months[key];
+}
+function ensureCurrentMonth(){
+  const key = currentMonthKey();
+  ensureMonth(key);
+  return key;
+}
+function monthKeyOffset(offset){
+  const d = new Date();
+  d.setMonth(d.getMonth() - offset);
+  return d.getFullYear()+'-'+pad(d.getMonth()+1);
+}
+
+function getMonthTotals(m){
+  const spent = m.expenses.reduce((s,e)=>s+e.amount,0);
+  const income = m.income.reduce((s,i)=>s+i.amount,0);
+  return { spent, income, remaining: m.budgetLimit - spent, netRemaining: income - spent };
+}
+
+/* ---------- TAB SWITCHING ---------- */
+function switchTab(tab){
+  currentTab = tab;
+  ['dashboard','planner','summary'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('hidden-tab', t!==tab);
+  });
+  document.querySelectorAll('.nav-btn').forEach(btn=>{
+    const active = btn.dataset.tab === tab;
+    btn.classList.toggle('bg-secondary-container', active);
+    btn.classList.toggle('text-on-secondary-container', active);
+    btn.classList.toggle('text-on-surface-variant', !active);
+  });
+  document.getElementById('fab-add').style.display = (tab==='dashboard') ? 'flex' : 'none';
+  renderAll();
+}
+
+/* ---------- MODALS ---------- */
+function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+
+function openExpenseModal(){
+  const sel = document.getElementById('exp-month');
+  sel.innerHTML = '';
+  for(let offset = 0; offset <= 5; offset++){
+    const key = monthKeyOffset(offset);
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = monthKeyToLabel(key);
+    sel.appendChild(opt);
+  }
+  sel.value = activeMonthKey;
+  document.getElementById('exp-day').value = currentDay();
+  document.getElementById('exp-desc').value = '';
+  document.getElementById('exp-amount').value = '';
+  openModal('modal-expense');
+}
+function saveExpense(){
+  const monthKey = document.getElementById('exp-month').value;
+  const day = Number(document.getElementById('exp-day').value);
+  const desc = document.getElementById('exp-desc').value.trim() || 'Expense';
+  const amount = Number(document.getElementById('exp-amount').value);
+  if(!day || day < 1 || day > 31 || !amount || amount <= 0){ alert('Enter a valid day and amount.'); return; }
+  const month = ensureMonth(monthKey);
+  month.expenses.push({ id:genId(), day, desc, amount });
+  saveData();
+  closeModal('modal-expense');
+  renderAll();
+}
+function deleteExpense(id){
+  data.months[activeMonthKey].expenses = data.months[activeMonthKey].expenses.filter(e=>e.id!==id);
+  saveData();
+  renderAll();
+}
+
+function openBudgetModal(){
+  document.getElementById('budget-amount').value = data.months[activeMonthKey].budgetLimit || '';
+  openModal('modal-budget');
+}
+function saveBudget(){
+  const amt = Number(document.getElementById('budget-amount').value);
+  if(amt < 0 || isNaN(amt)){ alert('Enter a valid budget.'); return; }
+  data.months[activeMonthKey].budgetLimit = amt;
+  saveData();
+  closeModal('modal-budget');
+  renderAll();
+}
+
+function openIncomeModal(){
+  document.getElementById('income-name').value = '';
+  document.getElementById('income-amount').value = '';
+  openModal('modal-income');
+}
+function saveIncome(){
+  const name = document.getElementById('income-name').value.trim();
+  const amount = Number(document.getElementById('income-amount').value);
+  if(!name || !amount || amount <= 0){ alert('Enter a valid name and amount.'); return; }
+  data.months[activeMonthKey].income.push({ id:genId(), name, amount });
+  saveData();
+  closeModal('modal-income');
+  renderAll();
+}
+function deleteIncome(id){
+  data.months[activeMonthKey].income = data.months[activeMonthKey].income.filter(i=>i.id!==id);
+  saveData();
+  renderAll();
+}
+
+function toggleDay(day){
+  expandedDays.has(day) ? expandedDays.delete(day) : expandedDays.add(day);
+  renderDashboard();
+}
+
+/* ---------- RENDER: DASHBOARD ---------- */
+function renderDashboard(){
+  const month = data.months[activeMonthKey];
+  const t = getMonthTotals(month);
+  document.getElementById('dash-month-label').textContent = monthKeyToLabel(activeMonthKey);
+  document.getElementById('dash-spent').textContent = fmt(t.spent);
+  document.getElementById('dash-budget').textContent = fmt(month.budgetLimit);
+  document.getElementById('dash-budget-mini').textContent = fmt(month.budgetLimit) + ' limit';
+
+  const remainingEl = document.getElementById('dash-remaining');
+  remainingEl.textContent = fmt(t.remaining);
+  remainingEl.classList.toggle('text-secondary', t.remaining >= 0);
+  remainingEl.classList.toggle('text-error', t.remaining < 0);
+
+  const pct = month.budgetLimit > 0 ? Math.min(100, (t.spent / month.budgetLimit) * 100) : 0;
+  document.getElementById('dash-progress-bar').style.width = pct + '%';
+  document.getElementById('dash-progress-bar').classList.toggle('bg-error', pct >= 100);
+  document.getElementById('dash-progress-bar').classList.toggle('bg-primary', pct < 100);
+  document.getElementById('dash-progress-pct').textContent = Math.round(pct) + '% used';
+
+  const byDay = {};
+  month.expenses.forEach(e => { (byDay[e.day] = byDay[e.day] || []).push(e); });
+  const days = Object.keys(byDay).map(Number).sort((a,b)=>b-a);
+
+  const listEl = document.getElementById('dash-day-list');
+  if(days.length === 0){
+    listEl.innerHTML = '<p class="font-body-md text-body-md text-on-surface-variant px-1 py-4 text-center">No expenses logged yet. Tap + to add one.</p>';
+    return;
+  }
+
+  listEl.innerHTML = days.map(day => {
+    const entries = byDay[day];
+    const dayTotal = entries.reduce((s,e)=>s+e.amount,0);
+    const expanded = expandedDays.has(day);
+    const itemsHtml = entries.map((e,idx) => `
+      <li class="flex justify-between items-center text-body-md">
+        <div class="flex items-center gap-3">
+          <span class="font-body-md">${idx+1}.</span>
+          <span class="font-body-md">${escapeHtml(e.desc)}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="font-label-sm text-label-sm">${fmt(e.amount)}</span>
+          <button onclick="deleteExpense('${e.id}')" class="material-symbols-outlined text-[16px] text-outline hover:text-error">close</button>
+        </div>
+      </li>`).join('');
+
+    return `
+      <div class="bg-surface-container-lowest rounded-xl soft-shadow overflow-hidden transition-all duration-200">
+        <button class="w-full flex justify-between items-center p-stack-md active-scale ${expanded ? 'border-b border-outline/5' : ''}" onclick="toggleDay(${day})">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+              <span class="font-headline-md text-headline-md text-primary">${day}</span>
+            </div>
+            <span class="font-headline-md text-headline-md">${fmt(dayTotal)}</span>
+          </div>
+          <span class="material-symbols-outlined text-outline transition-transform ${expanded ? 'rotate-180' : ''}">expand_more</span>
+        </button>
+        ${expanded ? `<div class="p-stack-md bg-white"><ul class="flex flex-col gap-3">${itemsHtml}</ul></div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+/* ---------- RENDER: PLANNER ---------- */
+function renderPlanner(){
+  const month = data.months[activeMonthKey];
+  document.getElementById('plan-month-label').textContent = monthKeyToLabel(activeMonthKey);
+  document.getElementById('plan-budget').textContent = fmt(month.budgetLimit);
+
+  const incomeListEl = document.getElementById('plan-income-list');
+  incomeListEl.innerHTML = month.income.length === 0
+    ? '<p class="font-body-md text-body-md text-on-surface-variant py-2">No income sources yet.</p>'
+    : month.income.map((src, idx) => `
+        <div class="flex items-center justify-between bg-surface-container-low p-2 rounded-lg">
+          <div class="flex items-center gap-2">
+            <span class="font-body-md text-body-md mr-1">${idx+1}.</span>
+            <span class="font-body-md text-body-md">${escapeHtml(src.name)}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-body-md text-body-md text-secondary font-bold">${fmt(src.amount)}</span>
+            <button onclick="deleteIncome('${src.id}')" class="material-symbols-outlined text-[16px] text-outline hover:text-error">close</button>
+          </div>
+        </div>`).join('');
+
+  const pastKeys = Object.keys(data.months).filter(k => k !== activeMonthKey).sort((a,b)=>b.localeCompare(a));
+  const pastEl = document.getElementById('plan-past-months');
+  pastEl.innerHTML = pastKeys.map(k => `
+    <div onclick="switchTab('summary')" class="bg-surface-container-low p-stack-md rounded-xl flex items-center justify-between active-scale transition-colors hover:bg-surface-container cursor-pointer">
+      <span class="font-body-lg text-body-lg text-on-surface">${monthKeyToLabel(k)}</span>
+      <span class="material-symbols-outlined text-on-surface-variant/40">chevron_right</span>
+    </div>`).join('');
+}
+
+/* ---------- RENDER: SUMMARY ---------- */
+function renderSummary(){
+  const keys = Object.keys(data.months).sort((a,b)=>b.localeCompare(a));
+  const listEl = document.getElementById('summary-list');
+  listEl.innerHTML = keys.map(k => {
+    const m = data.months[k];
+    const t = getMonthTotals(m);
+    const isCurrent = k === activeMonthKey;
+    return `
+      <div class="bg-surface-container-lowest rounded-xl p-stack-md soft-shadow ${isCurrent ? 'border-l-4 border-primary' : ''}">
+        <div class="flex justify-between items-start mb-2">
+          <h4 class="font-body-lg font-semibold ${isCurrent ? 'text-primary' : 'text-on-surface'}">${monthKeyToLabel(k)}</h4>
+          <div class="text-right">
+            <p class="font-label-sm text-on-surface-variant">Remaining</p>
+            <p class="font-headline-md text-headline-md ${t.netRemaining >= 0 ? 'text-secondary' : 'text-error'}">${fmt(t.netRemaining)}</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 pt-2 border-t border-outline-variant">
+          <div class="flex flex-col">
+            <span class="text-label-sm text-on-surface-variant">Income</span>
+            <span class="font-body-lg font-bold text-primary">${fmt(t.income)}</span>
+          </div>
+          <div class="flex flex-col text-right">
+            <span class="text-label-sm text-on-surface-variant">Total Spent</span>
+            <span class="font-body-lg font-bold text-primary">${fmt(t.spent)}</span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function renderAll(){
+  renderDashboard();
+  renderPlanner();
+  renderSummary();
+}
+
+switchTab('dashboard');
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+</script>
+
+</body></html>
